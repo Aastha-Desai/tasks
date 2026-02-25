@@ -21,12 +21,12 @@ export function makeBlankQuestion(
  * HINT: Look up the `trim` and `toLowerCase` functions.
  */
 export function isCorrect(question: Question, answer: string): boolean {
-    const cleanedQuestion = question.expected.trim().toLowerCase();
-    const cleanedAnswer = answer.trim().toLowerCase();
-    if(cleanedQuestion === cleanedAnswer){
-        return true
-    }
-    return false;
+    return (
+        question.expected.trim().toLowerCase() ===
+            answer.trim().toLowerCase()
+        ) ?
+            true
+        :   false;
 }
 
 /**
@@ -36,12 +36,13 @@ export function isCorrect(question: Question, answer: string): boolean {
  * be exactly one of the options.
  */
 export function isValid(question: Question, answer: string): boolean {
-    if(question.type === "short_answer_question"){
-        return true;
-    } else if(question.type === "multiple_choice_question"){
-        return question.options.includes(answer);
-    }
-    return false;
+    return (
+        question.type === "short_answer_question"
+            ? true
+            : question.options.findIndex(
+                  (value: string): boolean => value === answer,
+              ) !== -1
+    );
 }
 
 /**
@@ -51,8 +52,7 @@ export function isValid(question: Question, answer: string): boolean {
  * name "My First Question" would become "9: My First Q".
  */
 export function toShortForm(question: Question): string {
-    const shortName = question.name.slice(0,10);
-    return String(question.id) + ": " + shortName;
+    return question.id + ": " + question.name.substring(0, 10);
 }
 
 /**
@@ -73,23 +73,18 @@ export function toShortForm(question: Question): string {
  * Check the unit tests for more examples of what this looks like!
  */
 export function toMarkdown(question: Question): string {
-    const header = "# " + question.name;
-    const body = question.body;
-    const base = header + "\n" + body;
-    if(question.type === "multiple_choice_question"){
-        const optionText = question.options.map(option => "- " + option). join("\n");
-        return base + "\n" + optionText;
-    }
-    return base;
+    return question.type === "short_answer_question"
+        ? `# ${question.name}\n${question.body}`
+        : `# ${question.name}\n${question.body}\n- ${question.options.join(
+              "\n- ",
+          )}`;
 }
-
 /**
  * Return a new version of the given question, except the name should now be
  * `newName`.
  */
-export function renameQuestion(question: Question, newName: string): Question {
-    const versionName = {...question, name: newName};
-    return versionName;
+export function renameQuestion(question: Question,newName: string,): Question {
+    return { ...question, name: newName };
 }
 
 /**
@@ -98,8 +93,7 @@ export function renameQuestion(question: Question, newName: string): Question {
  * published; if it was published, now it should be not published.
  */
 export function publishQuestion(question: Question): Question {
-    const inverted = {...question, published: !question.published}
-    return inverted;
+    return { ...question, published: !question.published };
 }
 
 /**
@@ -138,13 +132,10 @@ export function mergeQuestion(
     { points }: { points: number }
 ): Question {
     return {
+        ...contentQuestion,
         id: id,
         name: name,
-        body: contentQuestion.body,
-        type: contentQuestion.type,
-        options: contentQuestion.options,
-        expected: contentQuestion.expected,
         points: points,
-        published: false
+        published: false,
     };
 }
