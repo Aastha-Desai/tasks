@@ -76,9 +76,19 @@ id,name,options,points,published
  * Check the unit tests for more examples!
  */
 export function toCSV(questions: Question[]): string {
-    const header = "id, name, options, points, published";
-    const row = questions.map((questions:Question): string => questions.id + "," +  questions.name + "," + questions.options.length + "," + questions.points + "," + questions.published);
-    return header + "\n" + row.join("\n");
+    return questions
+        .reduce(
+            (collective: string, question: Question): string =>
+                collective +
+                question.id + "," +
+                question.name + "," +
+                question.options.length + "," +
+                question.points + "," +
+                question.published +
+                "\n",
+            "id,name,options,points,published\n"
+        )
+        .trim();
 }
 
 /**
